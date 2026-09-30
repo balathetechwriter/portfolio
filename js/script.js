@@ -1,7 +1,6 @@
 const nav=document.querySelector('.nav');
 const glow=document.querySelector('.cursor-glow');
 const portrait=document.querySelector('#portraitMorph');
-const doc=document.querySelector('#morphDoc');
 const hero=document.querySelector('.morph-hero');
 const heroName=document.querySelector('#heroName');
 const heroRole=document.querySelector('#heroRole');
@@ -15,21 +14,35 @@ function frame(){
   if(hero){const r=hero.getBoundingClientRect();const max=Math.max(1,hero.offsetHeight-innerHeight);target=clamp(-r.top/max)}
   current+=(target-current)*0.085;
   const p=smoothstep(current);
-  if(sticky) sticky.classList.toggle('morphing', current > .06 && current < .92);
+  if(sticky) sticky.classList.toggle('morphing',current>.06&&current<.92);
   if(portrait){
-    const x=50+(76-50)*p,y=54+(50-54)*p,size=44+(22-44)*p,rot=1-1.5*p;
-    portrait.style.left=`${x}%`;portrait.style.top=`${y}%`;portrait.style.width=`${Math.max(20,size)}vw`;
-    portrait.style.transform=`translate(-50%,-50%) rotate(${rot}deg)`;
-    portrait.style.filter=`drop-shadow(0 ${35-17*p}px ${45-20*p}px rgba(20,20,20,${.13-.04*p}))`;
+    const morphP=smoothstep(clamp((current-.10)/.62));
+    const x=76+(72-76)*morphP, y=58+(50-58)*morphP, size=42+(31-42)*morphP;
+    portrait.style.left=`${x}%`; portrait.style.top=`${y}%`; portrait.style.width=`${Math.max(20,size)}vw`;
+    portrait.style.transform=`translate(-50%,-50%) rotate(${-.8*morphP}deg)`;
+    portrait.style.filter=`drop-shadow(0 ${30-12*p}px ${40-18*p}px rgba(20,20,20,${.14-.04*p}))`;
   }
-  if(heroName){const out=clamp(current/.34);heroName.style.opacity=String(1-out);heroName.style.transform=`translate(-50%,${-50-9*out}%) scale(${1-.08*out})`;heroName.style.filter=`blur(${out*5}px)`}
-  if(heroRole){const inP=smoothstep(clamp((current-.18)/.48));heroRole.style.opacity=String(inP);heroRole.style.transform=`translateY(-50%) translateX(${(1-inP)*-5}vw)`}
-  if(doc){const dp=smoothstep(clamp((current-.72)/.28));doc.style.opacity=dp;doc.style.transform=`translate(${18-dp*24}vw,${10-dp*8}vh) rotate(${7-dp*7}deg) scale(${.78+dp*.22})`}
-  if(scrollHint)scrollHint.style.opacity=String(1-clamp(current/.2));
-  if(blobs.length){blobs[0].style.transform=`translate(${current*-12}vw,${current*8}vh) scale(${1+current*.25})`;blobs[1].style.transform=`translate(${current*12}vw,${current*-10}vh)`;blobs[2].style.transform=`translate(${current*8}vw,${current*5}vh) scale(${1-current*.2})`}
-  requestAnimationFrame(frame)
+  if(heroName){
+    const out=smoothstep(clamp((current-.16)/.38));
+    heroName.style.opacity=String(1-out);
+    heroName.style.transform=`translateY(${(-50-5*out)}%) translateX(${-3*out}vw) scale(${1-.025*out})`;
+    heroName.style.filter=`blur(${out*2.5}px)`;
+  }
+  if(heroRole){
+    const inP=smoothstep(clamp((current-.28)/.42));
+    heroRole.style.opacity=String(inP);
+    heroRole.style.transform=`translateY(-50%) translateX(${(1-inP)*-5}vw)`;
+  }
+  if(scrollHint)scrollHint.style.opacity=String(1-clamp(current/.18));
+  if(blobs.length){
+    blobs[0].style.transform=`translate(${current*-10}vw,${current*7}vh) scale(${1+current*.2})`;
+    blobs[1].style.transform=`translate(${current*10}vw,${current*-8}vh)`;
+    blobs[2].style.transform=`translate(${current*6}vw,${current*4}vh) scale(${1-current*.15})`;
+  }
+  requestAnimationFrame(frame);
 }
-window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30),{passive:true});requestAnimationFrame(frame);
+window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>30),{passive:true});
+requestAnimationFrame(frame);
 document.addEventListener('mousemove',e=>{if(glow){glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px'}});
 const observer=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')}),{threshold:.12});
 document.querySelectorAll('.section,.work-card,.skill-group,.exp-row,.education-card,.interest-cloud span').forEach(el=>{el.classList.add('reveal');observer.observe(el)});
